@@ -1,31 +1,26 @@
-# Use the official Golang image to create a build artifact.
-FROM golang:1.18 as builder
+# Use the official Python image as the base image
+FROM python:3.9-slim as builder
 
-# Set the Current Working Directory inside the container
+# Set the working directory inside the container
 WORKDIR /app
 
-# Copy go mod and sum files
-COPY go.mod go.sum ./
-
-# Download all dependencies. Dependencies will be cached if the go.mod and go.sum files are not changed
-RUN go mod download
-
-# Copy the source from the current directory to the Working Directory inside the container
+# Copy the source code into the container
 COPY . .
 
-# Build the Go app
-RUN go build -o guestbook-go .
+# Install dependencies (if any)
+RUN pip install -r requirements.txt
 
 # Start a new stage from scratch
-FROM alpine:latest
+FROM python:3.9-slim
 
-WORKDIR /root/
+# Set the working directory for the new stage
+WORKDIR /app
 
-# Copy the Pre-built binary file from the previous stage
-COPY --from=builder /app/guestbook-go .
+# Copy the source code and dependencies from the builder stage
+COPY --from=builder /app .
 
-# Expose port 3000 to the outside world
+# Expose any necessary ports
 EXPOSE 3000
 
-# Command to run the executable
-CMD ["./guestbook-go"]
+# Command to run the application
+CMD ["python", "app.py"]
