@@ -34,4 +34,4 @@ jobs:
       uses: docker/build-push-action@v2
       with:
         push: true
-        tags: sugandhdevops/guestbook-go:latest
+        tags: sugandhdevops/saurabh-py:latest
